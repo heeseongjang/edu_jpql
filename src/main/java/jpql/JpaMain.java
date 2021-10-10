@@ -15,36 +15,52 @@ public class JpaMain {
         tx.begin();
 
         try {
-            for (int i = 0; i < 100; i++) {
-                Member member = new Member();
-                member.setAge(i);
-                member.setUsername("member" + i);
-                em.persist(member);
-            }
+//            for (int i = 0; i < 100; i++) {
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
 
+            Member member = new Member();
+            member.setAge(1);
+            member.setUsername("member1");
 
+            member.setTeam(team);
+            em.persist(member);
+//            }
 //            jpqlInit(em);
 
             em.flush();
             em.clear();
 //            projection(em);
+//            paging(em);
 
-            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
-                    .setFirstResult(1)
-                    .setMaxResults(10)
-                    .getResultList();
-
-            System.out.println("result.size = " + resultList.size());
-            for (Member member1 : resultList) {
-                System.out.println("member = " + member1);
-            }
-
+            join(em);
+            
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
         } finally {
             em.clear();
         }
+    }
+
+    private static void join(EntityManager em) {
+        //            String query = "select m from Member m inner join m.team t where  t.name =:teamName";
+//            String query = "select m from Member m left join m.team t";
+//            String query = "select m from Member m, Team t where m.username = t.name";
+//            String query = "select m from Member m left join m.team t on t.name = 'teamA'";
+        //연관관계 없는 외부 조인
+        String query = "select m from Member m left join Team t on m.username = t.name";
+        List<Member> result = em.createQuery(query, Member.class)
+//                    .setParameter("teamName", "teamA")
+                .getResultList();
+    }
+
+    private static void paging(EntityManager em) {
+        Member member = new Member();
+        member.setAge(10);
+        member.setUsername("member1");
+        em.persist(member);
     }
 
     private static void projection(EntityManager em) {
