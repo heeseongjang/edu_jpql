@@ -15,30 +15,48 @@ public class JpaMain {
         tx.begin();
 
         try {
-            Member member = new Member();
-            member.setAge(10);
-            member.setUsername("member1");
-            em.persist(member);
+            for (int i = 0; i < 100; i++) {
+                Member member = new Member();
+                member.setAge(i);
+                member.setUsername("member" + i);
+                em.persist(member);
+            }
+
 
 //            jpqlInit(em);
 
             em.flush();
             em.clear();
-            //엔티티 프로젝션은 영속성 컨텍스트에 관리 대상이다!
-            List<Member> results = em.createQuery("select m from Member m ", Member.class).getResultList();
-            Member findMember = results.get(0);
-            findMember.setAge(20);
+//            projection(em);
 
+            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(1)
+                    .setMaxResults(10)
+                    .getResultList();
 
-            List<MemberDTO> results2 = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m ", MemberDTO.class).getResultList();
+            System.out.println("result.size = " + resultList.size());
+            for (Member member1 : resultList) {
+                System.out.println("member = " + member1);
+            }
 
-            System.out.println(results.get(0).getUsername());
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
         } finally {
             em.clear();
         }
+    }
+
+    private static void projection(EntityManager em) {
+        //엔티티 프로젝션은 영속성 컨텍스트에 관리 대상이다!
+        List<Member> results = em.createQuery("select m from Member m ", Member.class).getResultList();
+        Member findMember = results.get(0);
+        findMember.setAge(20);
+
+
+        List<MemberDTO> results2 = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m ", MemberDTO.class).getResultList();
+
+        System.out.println(results.get(0).getUsername());
     }
 
     private static void jpqlInit(EntityManager em) {
