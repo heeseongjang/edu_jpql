@@ -27,8 +27,14 @@ public class JpaMain {
             member.setUsername("관리자");
             member.setType(MemberType.ADMIN);
 
+            Member member2 = new Member();
+            member2.setAge(2);
+            member2.setUsername("관리자2");
+            member2.setType(MemberType.ADMIN);
+
             member.setTeam(team);
             em.persist(member);
+            em.persist(member2);
 //            }
 //            jpqlInit(em);
 
@@ -40,8 +46,32 @@ public class JpaMain {
 //            join(em);
 //            subQuery(em);
 //            jpqlType(em);
+//            caseEx(em);
 
-//            String query = "" +
+//            String query = "select concat('a','b') from Member m";
+//            String query = "select substring(m.username,2,3) from Member m";
+//            String query = "select locate('de','abcdefg') from Member m";
+//            String query = "select size(t.members) from Team t";
+//            @OrderColumn 안쓰는 걸 추천
+//            String query = "select size(t.members) from Team t";
+            String query = "select function('group_concat', m.username) from Member m";
+            List<String> resultList = em.createQuery(query, String.class)
+                    .getResultList();
+
+            for (String s : resultList) {
+                System.out.println("s = " + s);
+            }
+
+            tx.commit();
+        } catch (Exception e) {
+            tx.rollback();
+        } finally {
+            em.clear();
+        }
+    }
+
+    private static void caseEx(EntityManager em) {
+        //            String query = "" +
 //                    "select " +
 //                    " case when m.age <= 10 then '학생요금'" +
 //                    "      when m.age >= 60 then '경로요금'" +
@@ -49,17 +79,11 @@ public class JpaMain {
 //                    "end " +
 //                    " from Member m";
 //            String query = "select coalesce(m.username, '이름 없는 회원') from Member m";
-            String query = "select NULLIF(m.username, '관리자') from Member m";
-            List<String> resultList = em.createQuery(query, String.class).getResultList();
+        String query = "select NULLIF(m.username, '관리자') from Member m";
+        List<String> resultList = em.createQuery(query, String.class).getResultList();
 
-            for (String s : resultList) {
-                System.out.println("s = " + s);
-            }
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-        } finally {
-            em.clear();
+        for (String s : resultList) {
+            System.out.println("s = " + s);
         }
     }
 
