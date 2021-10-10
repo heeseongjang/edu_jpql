@@ -9,7 +9,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class Member {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     private String username;
     private int age;
@@ -18,7 +19,10 @@ public class Member {
     @JoinColumn(name = "TEAM_ID")
     private Team team;
 
-    public void changeTeam(Team team){
+    @Enumerated(EnumType.STRING)
+    private MemberType type;
+
+    public void changeTeam(Team team) {
         this.team = team;
         team.getMembers().add(this);
     }

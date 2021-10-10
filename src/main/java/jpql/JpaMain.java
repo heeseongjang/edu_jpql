@@ -23,6 +23,7 @@ public class JpaMain {
             Member member = new Member();
             member.setAge(1);
             member.setUsername("member1");
+            member.setType(MemberType.ADMIN);
 
             member.setTeam(team);
             em.persist(member);
@@ -34,14 +35,29 @@ public class JpaMain {
 //            projection(em);
 //            paging(em);
 
-            join(em);
-            
+//            join(em);
+//            subQuery(em);
+
+
+            String query = "select m.username, 'HELLO', TRUE from Member m" +
+                    " where m.type = jpql.MemberType.ADMIN" +
+                    " and m.age between 0 and 10";
+            List<Object[]> result = em.createQuery(query)
+                    .getResultList();
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
         } finally {
             em.clear();
         }
+    }
+
+    private static void subQuery(EntityManager em) {
+        //from절의 subQuery는 불가
+        String query = "select (select avg(m1.age) from Member m1) from Member m join Team t on m.username = t.name";
+        List<Member> result = em.createQuery(query, Member.class)
+                .getResultList();
     }
 
     private static void join(EntityManager em) {
