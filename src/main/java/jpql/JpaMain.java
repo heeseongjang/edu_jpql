@@ -22,7 +22,9 @@ public class JpaMain {
 
             Member member = new Member();
             member.setAge(1);
-            member.setUsername("member1");
+//            member.setUsername("member1");
+//            member.setUsername(null);
+            member.setUsername("관리자");
             member.setType(MemberType.ADMIN);
 
             member.setTeam(team);
@@ -32,25 +34,41 @@ public class JpaMain {
 
             em.flush();
             em.clear();
+
 //            projection(em);
 //            paging(em);
-
 //            join(em);
 //            subQuery(em);
+//            jpqlType(em);
 
+//            String query = "" +
+//                    "select " +
+//                    " case when m.age <= 10 then '학생요금'" +
+//                    "      when m.age >= 60 then '경로요금'" +
+//                    "      else '일반요금'" +
+//                    "end " +
+//                    " from Member m";
+//            String query = "select coalesce(m.username, '이름 없는 회원') from Member m";
+            String query = "select NULLIF(m.username, '관리자') from Member m";
+            List<String> resultList = em.createQuery(query, String.class).getResultList();
 
-            String query = "select m.username, 'HELLO', TRUE from Member m" +
-                    " where m.type = jpql.MemberType.ADMIN" +
-                    " and m.age between 0 and 10";
-            List<Object[]> result = em.createQuery(query)
-                    .getResultList();
-
+            for (String s : resultList) {
+                System.out.println("s = " + s);
+            }
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
         } finally {
             em.clear();
         }
+    }
+
+    private static void jpqlType(EntityManager em) {
+        String query = "select m.username, 'HELLO', TRUE from Member m" +
+                " where m.type = jpql.MemberType.ADMIN" +
+                " and m.age between 0 and 10";
+        List<Object[]> result = em.createQuery(query)
+                .getResultList();
     }
 
     private static void subQuery(EntityManager em) {
