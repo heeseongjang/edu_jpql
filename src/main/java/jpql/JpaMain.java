@@ -16,25 +16,34 @@ public class JpaMain {
 
         try {
 //            for (int i = 0; i < 100; i++) {
-            Team team = new Team();
-            team.setName("teamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("팀A");
+            em.persist(teamA);
+
+            Team teamB = new Team();
+            teamB.setName("팀B");
+            em.persist(teamB);
 
             Member member = new Member();
-            member.setAge(1);
+//            member.setAge(1);
 //            member.setUsername("member1");
 //            member.setUsername(null);
-            member.setUsername("관리자");
-            member.setType(MemberType.ADMIN);
+            member.setUsername("회원1");
+            member.setTeam(teamA);
+//            member.setType(MemberType.ADMIN);
 
             Member member2 = new Member();
-            member2.setAge(2);
-            member2.setUsername("관리자2");
-            member2.setType(MemberType.ADMIN);
+//            member2.setAge(2);
+            member2.setUsername("회원2");
+//            member2.setType(MemberType.ADMIN);
+            member2.setTeam(teamA);
 
-            member.setTeam(team);
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setTeam(teamB);
             em.persist(member);
             em.persist(member2);
+            em.persist(member3);
 //            }
 //            jpqlInit(em);
 
@@ -48,8 +57,26 @@ public class JpaMain {
 //            jpqlType(em);
 //            caseEx(em);
 //            function(em);
-            pathExpression(em);
+//            pathExpression(em);
 
+//            String query = "select m From Member m";
+//            String query = "select m From Member m join fetch m.team"; //조회할때 팀까지 조회해오자
+//            List<Member> resultList = em.createQuery(query, Member.class)
+//                    .getResultList();
+            //회원1, 팀A(SQL)
+            //회원2, 팀A(1차캐시)
+            //회원3, 팀B(SQL)
+            //회원 100명이면? 이래서 페치 조인
+
+
+
+            String query = "select distinct t From Team t join fetch t.members";
+            List<Team> resultList = em.createQuery(query, Team.class)
+                    .getResultList();
+
+            for (Team s : resultList) {
+                System.out.println("team = " + s.getName() + "|Members = " + s.getMembers().size());
+            }
 
             tx.commit();
         } catch (Exception e) {
