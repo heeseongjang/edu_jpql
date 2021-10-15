@@ -2,11 +2,9 @@ package jpql;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +12,13 @@ import java.util.List;
 @Getter
 @Setter
 public class Team {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String name;
 
-    @OneToMany(mappedBy = "team")
+    //    @BatchSize(size = 100) //persistence.xml에서 사용
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private List<Member> members = new ArrayList<>();
 }

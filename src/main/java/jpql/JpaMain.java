@@ -58,20 +58,16 @@ public class JpaMain {
 //            caseEx(em);
 //            function(em);
 //            pathExpression(em);
-
-//            String query = "select m From Member m";
-//            String query = "select m From Member m join fetch m.team"; //조회할때 팀까지 조회해오자
-//            List<Member> resultList = em.createQuery(query, Member.class)
-//                    .getResultList();
-            //회원1, 팀A(SQL)
-            //회원2, 팀A(1차캐시)
-            //회원3, 팀B(SQL)
-            //회원 100명이면? 이래서 페치 조인
+//            fetchJoin1(em);
 
 
-
-            String query = "select distinct t From Team t join fetch t.members";
+//            String query = "select distinct t From Team t join fetch t.members as m";//별칭 되도록 금지!
+//            String query = "select t From Team t join fetch t.members m";
+            String query = "select t From Team t ";
             List<Team> resultList = em.createQuery(query, Team.class)
+                    .setFirstResult(0)
+//                    .setMaxResults(1)
+                    .setMaxResults(2)
                     .getResultList();
 
             for (Team s : resultList) {
@@ -83,6 +79,25 @@ public class JpaMain {
             tx.rollback();
         } finally {
             em.clear();
+        }
+    }
+
+    private static void fetchJoin1(EntityManager em) {
+        //            String query = "select m From Member m";
+//            String query = "select m From Member m join fetch m.team"; //조회할때 팀까지 조회해오자
+//            List<Member> resultList = em.createQuery(query, Member.class)
+//                    .getResultList();
+        //회원1, 팀A(SQL)
+        //회원2, 팀A(1차캐시)
+        //회원3, 팀B(SQL)
+        //회원 100명이면? 이래서 페치 조인
+
+        String query = "select distinct t From Team t join fetch t.members";
+        List<Team> resultList = em.createQuery(query, Team.class)
+                .getResultList();
+
+        for (Team s : resultList) {
+            System.out.println("team = " + s.getName() + "|Members = " + s.getMembers().size());
         }
     }
 
@@ -190,6 +205,5 @@ public class JpaMain {
 
         //반환 값이 명확하지 않을 떄
         Query query2 = em.createQuery("select m.username, m.age from Member m");
-
     }
 }
