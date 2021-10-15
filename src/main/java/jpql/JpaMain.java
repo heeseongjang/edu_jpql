@@ -47,8 +47,8 @@ public class JpaMain {
 //            }
 //            jpqlInit(em);
 
-            em.flush();
-            em.clear();
+//            em.flush();
+//            em.clear();
 
 //            projection(em);
 //            paging(em);
@@ -61,19 +61,29 @@ public class JpaMain {
 //            fetchJoin1(em);
 //            fetchJoin2(em);
 //            entity(em, teamA);
+//            namedQuery(em, member);
 
-            List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
-                    .setParameter("username", "회원2")
-                    .getResultList();
-            for (Member m : resultList){
-                System.out.println("member : " + member);
-            }
+            int resultCount = em.createQuery("update Member m set m.age=20")
+                    .executeUpdate();
+            System.out.println(resultCount);
 
+            em.clear();
+            Member findMember = em.find(Member.class, member.getId());
+            System.out.println("findMember = " + findMember.getAge());
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
         } finally {
             em.clear();
+        }
+    }
+
+    private static void namedQuery(EntityManager em, Member member) {
+        List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+                .setParameter("username", "회원2")
+                .getResultList();
+        for (Member m : resultList){
+            System.out.println("member : " + member);
         }
     }
 
