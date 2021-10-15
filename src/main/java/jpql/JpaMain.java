@@ -59,26 +59,41 @@ public class JpaMain {
 //            function(em);
 //            pathExpression(em);
 //            fetchJoin1(em);
+//            fetchJoin2(em);
 
 
-//            String query = "select distinct t From Team t join fetch t.members as m";//별칭 되도록 금지!
-//            String query = "select t From Team t join fetch t.members m";
-            String query = "select t From Team t ";
-            List<Team> resultList = em.createQuery(query, Team.class)
-                    .setFirstResult(0)
-//                    .setMaxResults(1)
-                    .setMaxResults(2)
-                    .getResultList();
+//            String query = "select m from Member m where m = :member";
+//            String query = "select m from Member m where m.id = :member";
+            String query = "select m from Member m where m.team = :team";
 
-            for (Team s : resultList) {
-                System.out.println("team = " + s.getName() + "|Members = " + s.getMembers().size());
-            }
+            Member findMember = em.createQuery(query, Member.class)
+//                   .setParameter("member", member)
+//                   .setParameter("memberId", member.getId())
+                   .setParameter("team", teamA)
+                    .getSingleResult();
+
+            System.out.println("findMember : "  + findMember);
 
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
         } finally {
             em.clear();
+        }
+    }
+
+    private static void fetchJoin2(EntityManager em) {
+        //            String query = "select distinct t From Team t join fetch t.members as m";//별칭 되도록 금지!
+//            String query = "select t From Team t join fetch t.members m";
+        String query = "select t From Team t ";
+        List<Team> resultList = em.createQuery(query, Team.class)
+                .setFirstResult(0)
+//                    .setMaxResults(1)
+                .setMaxResults(2)
+                .getResultList();
+
+        for (Team s : resultList) {
+            System.out.println("team = " + s.getName() + "|Members = " + s.getMembers().size());
         }
     }
 
